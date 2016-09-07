@@ -39,7 +39,7 @@ defmodule Quizzy.StreamController do
         end
 
         file
-        |> Poison.Parser.parse!(keys: :atoms!)
+        |> Poison.Parser.parse!(keys: :atoms)
         |> Enum.map(&(Events.json_to_event(&1)))
         |> Enum.sort(&(sort_events.(&1, &2)))
     end
