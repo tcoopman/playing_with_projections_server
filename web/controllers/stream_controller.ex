@@ -19,7 +19,8 @@ defmodule Quizzy.StreamController do
             Path.extname(file) == ".json"
         end
 
-        path = "./data"
+        IO.inspect File.ls
+        path = "data"
 
         path
         |> File.ls!
