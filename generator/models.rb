@@ -172,8 +172,14 @@ module Statistics
       [
           generate_event('QuestionWasOpened', DateTime.now, @options),
           generate_event('QuestionWasClosed', DateTime.now, @options)
-      ] + 
+      ]
       #+ players.map{|player| answer_question(question, player)}
+    end
+  end
+
+  class Answer
+    def initialize(game, question, player)
+
     end
   end
 
