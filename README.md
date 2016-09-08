@@ -1,4 +1,3 @@
-
 # Quizzy
 
 To start your Phoenix app:
@@ -78,3 +77,7 @@ Ready to run in production? Please [check our deployment guides](http://www.phoe
 ## Heroku
 
 https://playing-with-projections.herokuapp.com/
+
+## Testing
+
+run `mix test`
