@@ -124,14 +124,14 @@ module Statistics
       @started_at = @attendances.map(&:joined_at).max + a_few_seconds
 
       @question_rounds = @quiz.questions.map{|question| QuestionRound.new(self, question, @players)}
-
+      @finished_at = @question_rounds.map(&:closed_at).max + 1.0/(24*60*60)
     end
 
     def events
       [
           generate_event('GameWasOpened', opened_at, @options.except(:opened_at)),
           generate_event('GameWasStarted', @started_at, {game_id: game_id}),
-          generate_event('GameWasFinished', DateTime.now, {game_id: game_id})
+          generate_event('GameWasFinished', @finished_at, {game_id: game_id})
       ] + @attendances.map(&:events) + @question_rounds.map(&:events)
     end
   end
@@ -159,7 +159,7 @@ module Statistics
     include EventGenerator
     include TimeHelpers
 
-    attr_reader :opened_at
+    attr_reader :opened_at, :closed_at
     def initialize(game, question, players)
       @options ={
           game_id: game.game_id,
