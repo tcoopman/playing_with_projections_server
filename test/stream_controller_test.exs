@@ -1,8 +1,6 @@
 defmodule Quizzy.StreamControllerTest do
     use Quizzy.ConnCase
 
-    alias Quizzy.StreamController
-
     test "/stream/0", %{conn: conn} do
         conn = get conn, "/stream/0"
         assert json_response(conn, 200) 
