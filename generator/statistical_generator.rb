@@ -11,7 +11,9 @@ module Statistics
       startup_date = DateTime.parse('2016-1-1T08:00:00')
       top_date = startup_date + 150
       puts top_date
-      players = (1..20).map { Player.generate(Rubystats::NormalDistribution.new(top_date)) }
+      date_generator = Rubystats::NormalDistribution.new(top_date, 50)
+      iq_generator = Rubystats::NormalDistribution.new(100, 20)
+      players = (1..20).map { Player.generate(date_generator, iq_generator) }
       quizzes = players.map(&:create_quizzes).flatten
       games = generate_games(players, quizzes)
       [players, quizzes, games].flatten

@@ -1,11 +1,12 @@
 module Statistics
   class Player
-    def self.generate date_generator
+    def self.generate(date_generator, iq_generator)
       Player.new(
           player_id: SecureRandom.uuid,
           first_name: Faker::Name.first_name,
           last_name: Faker::Name.last_name,
-          registered_at: date_generator.rng
+          registered_at: date_generator.rng,
+          iq: iq_generator.rng
       )
     end
 
@@ -19,7 +20,7 @@ module Statistics
 
     def events
       [
-          generate_event('PlayerHasRegistered', registered_at, @options.except(:registered_at ))
+          generate_event('PlayerHasRegistered', registered_at, @options.except(:registered_at, :iq ))
       ]
     end
 
@@ -35,6 +36,7 @@ module Statistics
   class Quiz
     def self.generate(author, created_at)
       Quiz.new(
+          author,
           quiz_id: SecureRandom.uuid,
           owner_id: author.player_id,
           created_at: created_at
@@ -45,9 +47,10 @@ module Statistics
     include EventGenerator
     include TimeHelpers
 
-    attr_reader :questions, :published_at
+    attr_reader :author, :questions, :published_at
 
-    def initialize(options)
+    def initialize(author, options)
+      @author = author
       @options = options
       @theme = choose_theme
       @options[:quiz_title] = @theme.title
@@ -66,7 +69,7 @@ module Statistics
 
     def events
       [
-          generate_event('QuizWasCreated', created_at, @options.except(:created_at )),
+          generate_event('QuizWasCreated', created_at, @options.except(:created_at, :difficulty )),
           generate_event('QuizWasPublished', @published_at, quiz_id: quiz_id)
       ] + @questions.map(&:events)
     end
@@ -82,7 +85,8 @@ module Statistics
           quiz_id: quiz.quiz_id,
           question: q_and_a.first,
           answer: q_and_a.last,
-          created_at: quiz.created_at + a_few_minutes
+          created_at: quiz.created_at + a_few_minutes,
+          difficulty: quiz.author.iq
       )
     end
 
@@ -199,6 +203,8 @@ module Statistics
 
     attr_reader :answered_at
     def initialize(question, question_round, player)
+      @question = question
+      @player = player
       answer = right_answer? ? question.answer : question.wrong_answer
       @options ={
           game_id: question_round.game_id,
@@ -210,7 +216,7 @@ module Statistics
     end
 
     def right_answer?
-      ((1..4).to_a.sample == 1)
+      @player.iq >= @question.difficulty
     end
 
     def events
