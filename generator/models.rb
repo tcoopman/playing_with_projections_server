@@ -11,6 +11,7 @@ module Statistics
 
     include HashToFields
     include EventGenerator
+    include TimeHelpers
 
     def initialize(options)
       @options = options
@@ -23,17 +24,20 @@ module Statistics
     end
 
     def create_quizzes
-      (1..2).map{ Quiz.generate(self) }
+      [
+          quiz_1 = Quiz.generate(self, registered_at + a_few_minutes),
+          Quiz.generate(self, quiz_1.published_at + a_few_seconds)
+      ] + (1..4).map{ Quiz.generate(self, registered_at + a_few_days) }
     end
   end
 
   require_relative 'themes'
   class Quiz
-    def self.generate author
+    def self.generate(author, created_at)
       Quiz.new(
           quiz_id: SecureRandom.uuid,
           owner_id: author.player_id,
-          created_at: author.registered_at + 1.0 * Random.new.rand(1000)/10
+          created_at: created_at
       )
     end
 
@@ -41,7 +45,7 @@ module Statistics
     include EventGenerator
     include TimeHelpers
 
-    attr_reader :questions
+    attr_reader :questions, :published_at
 
     def initialize(options)
       @options = options
@@ -121,10 +125,10 @@ module Statistics
       @options = options
 
       @attendances = @players.map{|player| Attendance.new(self, player)}
-      @started_at = @attendances.map(&:joined_at).max + a_few_seconds
+      @started_at = @attendances.map(&:joined_at).max + a_second
 
       @question_rounds = @quiz.questions.map{|question| QuestionRound.new(self, question, @players)}
-      @finished_at = @question_rounds.map(&:closed_at).max + 1.0/(24*60*60)
+      @finished_at = @question_rounds.map(&:closed_at).max + a_second
     end
 
     def events
@@ -170,7 +174,7 @@ module Statistics
       @opened_at = game.started_at + a_few_minutes
 
       @answers = players.map{|player| Answer.new(question, self, player)}
-      @closed_at = @answers.map(&:answered_at).max + 1.0/(24*60*60) # so that 'question closed' comes after last 'answer given' :-(
+      @closed_at = @answers.map(&:answered_at).max + a_second
     end
 
     def events
@@ -188,7 +192,7 @@ module Statistics
 
     attr_reader :answered_at
     def initialize(question, question_round, player)
-      answer = ((1..4).to_a.sample == 1) ? question.answer : Faker::Lorem.word
+      answer = right_answer? ? question.answer : Faker::Lorem.word
       @options ={
           game_id: question_round.game_id,
           question_id: question_round.question_id,
@@ -196,6 +200,10 @@ module Statistics
           answer: answer
       }
       @answered_at = question_round.opened_at + a_few_seconds
+    end
+
+    def right_answer?
+      ((1..4).to_a.sample == 1)
     end
 
     def events
