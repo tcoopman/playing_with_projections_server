@@ -178,7 +178,7 @@ module Statistics
       @opened_at = game.started_at + a_few_minutes
 
       @answers = players.map{|player| Answer.new(question, self, player)}
-      @closed_at = DateTime.now
+      @closed_at = @answers.map(&:answered_at).max + 1.0/(24*60*60) # so that 'question closed' comes after last 'answer given' :-(
     end
 
     def events
