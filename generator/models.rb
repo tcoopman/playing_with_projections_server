@@ -11,6 +11,7 @@ module Statistics
 
     include HashToFields
     include EventGenerator
+    include TimeHelpers
 
     def initialize(options)
       @options = options
@@ -23,17 +24,20 @@ module Statistics
     end
 
     def create_quizzes
-      (1..2).map{ Quiz.generate(self) }
+      [
+          quiz_1 = Quiz.generate(self, registered_at + a_few_minutes),
+          Quiz.generate(self, quiz_1.published_at + a_few_seconds)
+      ] + (1..4).map{ Quiz.generate(self, registered_at + a_few_days) }
     end
   end
 
   require_relative 'themes'
   class Quiz
-    def self.generate author
+    def self.generate(author, created_at)
       Quiz.new(
           quiz_id: SecureRandom.uuid,
           owner_id: author.player_id,
-          created_at: author.registered_at + 1.0 * Random.new.rand(1000)/10
+          created_at: created_at
       )
     end
 
@@ -41,7 +45,7 @@ module Statistics
     include EventGenerator
     include TimeHelpers
 
-    attr_reader :questions
+    attr_reader :questions, :published_at
 
     def initialize(options)
       @options = options
@@ -113,28 +117,26 @@ module Statistics
     include TimeHelpers
     extend TimeHelpers
 
+    attr_reader :started_at
+
     def initialize(quiz, players, options)
       @quiz = quiz
       @players = players
       @options = options
+
       @attendances = @players.map{|player| Attendance.new(self, player)}
+      @started_at = @attendances.map(&:joined_at).max + a_second
+
       @question_rounds = @quiz.questions.map{|question| QuestionRound.new(self, question, @players)}
+      @finished_at = @question_rounds.map(&:closed_at).max + a_second
     end
 
     def events
       [
           generate_event('GameWasOpened', opened_at, @options.except(:opened_at)),
-          generate_event('GameWasStarted', @attendances.map(&:joined_at).max + a_few_seconds, {game_id: game_id}),
-          generate_event('GameWasFinished', DateTime.now, {game_id: game_id})
+          generate_event('GameWasStarted', @started_at, {game_id: game_id}),
+          generate_event('GameWasFinished', @finished_at, {game_id: game_id})
       ] + @attendances.map(&:events) + @question_rounds.map(&:events)
-    end
-
-    def answer_question(question, player)
-      if (1..4).to_a.sample == 1
-        generate_event('AnswerWasGiven', DateTime.now, {game_id: game_id, question_id: question.question_id, player_id: player.player_id, answer: question.answer})
-      else
-        generate_event('AnswerWasGiven', DateTime.now, {game_id: game_id, question_id: question.question_id, player_id: player.player_id, answer: Faker::Lorem.word})
-      end
     end
   end
 
@@ -159,27 +161,53 @@ module Statistics
   class QuestionRound
     include HashToFields
     include EventGenerator
+    include TimeHelpers
 
+    attr_reader :opened_at, :closed_at
     def initialize(game, question, players)
       @options ={
           game_id: game.game_id,
           question_id: question.question_id
       }
-      @answers = players.map{|player| Answer.new(game, question, player)}
+
+      #TODO: make question rounds follow each other cronologically
+      @opened_at = game.started_at + a_few_minutes
+
+      @answers = players.map{|player| Answer.new(question, self, player)}
+      @closed_at = @answers.map(&:answered_at).max + a_second
     end
 
     def events
       [
-          generate_event('QuestionWasOpened', DateTime.now, @options),
-          generate_event('QuestionWasClosed', DateTime.now, @options)
-      ]
-      #+ players.map{|player| answer_question(question, player)}
+          generate_event('QuestionWasOpened', @opened_at, @options),
+          generate_event('QuestionWasClosed', @closed_at, @options)
+      ] + @answers.map(&:events)
     end
   end
 
   class Answer
-    def initialize(game, question, player)
+    include EventGenerator
+    include HashToFields
+    include TimeHelpers
 
+    attr_reader :answered_at
+    def initialize(question, question_round, player)
+      answer = right_answer? ? question.answer : Faker::Lorem.word
+      @options ={
+          game_id: question_round.game_id,
+          question_id: question_round.question_id,
+          player_id: player.player_id,
+          answer: answer
+      }
+      @answered_at = question_round.opened_at + a_few_seconds
+    end
+
+    def right_answer?
+      ((1..4).to_a.sample == 1)
+    end
+
+    def events
+      generate_event('AnswerWasGiven', @answered_at, @options)
     end
   end
 
