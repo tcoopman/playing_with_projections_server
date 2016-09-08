@@ -77,6 +77,7 @@ module Statistics
     def self.generate(quiz, theme)
       q_and_a = theme.question_and_answer
       Question.new(
+                  quiz, theme,
           question_id: SecureRandom.uuid,
           quiz_id: quiz.quiz_id,
           question: q_and_a.first,
@@ -90,8 +91,14 @@ module Statistics
     include TimeHelpers
     extend TimeHelpers
 
-    def initialize(options)
+    def initialize(quiz, theme, options)
       @options = options
+      @quiz = quiz
+      @theme = theme
+    end
+
+    def wrong_answer
+      @theme.question_and_answer.last
     end
 
     def events
@@ -192,7 +199,7 @@ module Statistics
 
     attr_reader :answered_at
     def initialize(question, question_round, player)
-      answer = right_answer? ? question.answer : Faker::Lorem.word
+      answer = right_answer? ? question.answer : question.wrong_answer
       @options ={
           game_id: question_round.game_id,
           question_id: question_round.question_id,
