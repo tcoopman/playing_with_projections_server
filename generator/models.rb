@@ -134,14 +134,6 @@ module Statistics
           generate_event('GameWasFinished', DateTime.now, {game_id: game_id})
       ] + @attendances.map(&:events) + @question_rounds.map(&:events)
     end
-
-    def answer_question(question, player)
-      if (1..4).to_a.sample == 1
-        generate_event('AnswerWasGiven', DateTime.now, {game_id: game_id, question_id: question.question_id, player_id: player.player_id, answer: question.answer})
-      else
-        generate_event('AnswerWasGiven', DateTime.now, {game_id: game_id, question_id: question.question_id, player_id: player.player_id, answer: Faker::Lorem.word})
-      end
-    end
   end
 
   class Attendance
