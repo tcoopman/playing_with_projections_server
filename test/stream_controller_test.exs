@@ -2,12 +2,8 @@ defmodule Quizzy.StreamControllerTest do
     use Quizzy.ConnCase
 
     test "/stream/0", %{conn: conn} do
+        # it's enough to test one stream, because it loads all streams
         conn = get conn, "/stream/0"
-        assert json_response(conn, 200) 
-    end
-    
-    test "/stream/1", %{conn: conn} do
-        conn = get conn, "/stream/1"
         assert json_response(conn, 200) 
     end
 end

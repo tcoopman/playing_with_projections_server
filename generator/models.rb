@@ -190,8 +190,8 @@ module Statistics
 
     def events
       [
-          generate_event('QuestionWasOpened', @opened_at, @options),
-          generate_event('QuestionWasClosed', @closed_at, @options)
+          generate_event('QuestionWasAsked', @opened_at, @options),
+          generate_event('QuestionWasCompleted', @closed_at, @options)
       ] + @answers.map(&:events)
     end
   end

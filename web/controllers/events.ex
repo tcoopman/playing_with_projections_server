@@ -47,7 +47,7 @@ defmodule Quizzy.Events do
     defstruct [:meta, :game_id, :player_id]
   end
 
-  defmodule QuestionWasOpened do
+  defmodule QuestionWasAsked do
     @enforce_keys [:meta, :game_id, :question_id]
     defstruct [:meta, :game_id, :question_id]
   end
@@ -57,12 +57,12 @@ defmodule Quizzy.Events do
     defstruct [:meta, :game_id, :question_id, :answer]
   end
 
-  defmodule QuestionTimedOut do
+  defmodule TimerHasExpired do
     @enforce_keys [:meta, :game_id, :question_id]
     defstruct [:meta, :game_id, :question_id]
   end
 
-  defmodule QuestionWasClosed do
+  defmodule QuestionWasCompleted do
     @enforce_keys [:meta, :game_id, :question_id]
     defstruct [:meta, :game_id, :question_id]
   end
@@ -129,8 +129,8 @@ defmodule Quizzy.Events do
                     game_id: payload.game_id,
                     player_id: payload.player_id
                 }
-            "QuestionWasOpened" ->
-                %QuestionWasOpened{
+            "QuestionWasAsked" ->
+                %QuestionWasAsked{
                     meta: meta(id, timestamp),
                     game_id: payload.game_id,
                     question_id: payload.question_id
@@ -143,14 +143,14 @@ defmodule Quizzy.Events do
                     question_id: payload.question_id,
                     answer: payload.answer
                 }
-            "QuestionTimedOut" ->
-                %QuestionTimedOut{
+            "TimerHasExpired" ->
+                %TimerHasExpired{
                     meta: meta(id, timestamp),
                     game_id: payload.game_id,
                     question_id: payload.question_id,
                 }
-            "QuestionWasClosed" ->
-                %QuestionWasClosed{
+            "QuestionWasCompleted" ->
+                %QuestionWasCompleted{
                     meta: meta(id, timestamp),
                     game_id: payload.game_id,
                     question_id: payload.question_id,
