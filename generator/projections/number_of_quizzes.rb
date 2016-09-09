@@ -1,5 +1,7 @@
-require_relative 'stream_reader.rb'
-stream = ARGV.first || 0
+class NumberOfPublishedQuizzes
+  def project(stream )
+    count = stream.select{|e| e['type'] == 'QuizWasPublished' }.count
+    "Number of quizzes published: #{count}"
+  end
+end
 
-quiz_published = StreamReader.events(stream).select{|e| e['type'] == 'QuizWasPublished' }.count
-puts "#{quiz_published} quizzes published"
