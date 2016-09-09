@@ -24,7 +24,19 @@ module Statistics
     end
 
     def generate_games(players, quizzes)
-      (1..100).map{ Game.generate(quizzes.sample, players.sample(5)) }
+      (1..100).map{ Game.generate(weighted_by(quizzes, :popularity).sample, players.sample(5)) }
+    end
+
+    def weighted_by(array, attribute)
+      result = []
+
+      array.each do |item|
+        (1..item.send(attribute)).each do
+          result << item
+        end
+      end
+
+      result
     end
 
   end
