@@ -3,7 +3,7 @@ class StreamReader
   require 'rest-client'
 
   def self.events(stream_id)
-    base_uri = 'http://localhost:4000'
+    base_uri = 'http://playing-with-projections.herokuapp.com'
     stream = "#{base_uri}/stream/#{stream_id}"
     puts "Reading from '#{stream}'"
 

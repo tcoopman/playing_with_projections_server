@@ -2,7 +2,8 @@ require_relative 'stream_reader.rb'
 stream = ARGV.first || 0
 
 def month_of(quiz)
-  DateTime.parse(quiz['timestamp']).month
+  date = DateTime.parse(quiz['timestamp'])
+  "#{date.month}/#{date.year}"
 end
 
 
