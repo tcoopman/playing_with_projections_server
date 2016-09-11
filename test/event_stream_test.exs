@@ -4,14 +4,23 @@ defmodule Quizzy.EventStream.Test do
     alias Quizzy.EventStream
 
     setup do
-        EventStream.start
+        EventStream.start_link
 
         on_exit fn -> EventStream.stop end
     end
 
     test "getting a non existing stream id, returns an empty stream" do
-        EventStream.start
+        assert EventStream.get("invalid_id") == []
+    end
 
-        assert EventStream.get(1) == []
+    test "getting an existing stream id, returns a stream of events" do
+        stream = EventStream.get("0")
+
+        assert Enum.count(stream) > 0
+
+        Enum.each(stream, fn event -> 
+            event_name = inspect event.__struct__
+            assert String.starts_with? event_name, "Quizzy.Events."
+        end)
     end
 end

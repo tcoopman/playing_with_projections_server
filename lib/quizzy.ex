@@ -9,6 +9,7 @@ defmodule Quizzy do
     children = [
       # Start the endpoint when the application starts
       supervisor(Quizzy.Endpoint, []),
+      worker(Quizzy.EventStream, [])
       # Here you could define other workers and supervisors as children
       # worker(Quizzy.Worker, [arg1, arg2, arg3]),
     ]
