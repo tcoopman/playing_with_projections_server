@@ -15,6 +15,7 @@ module Statistics
       puts top_date
       date_generator = Rubystats::NormalDistribution.new(top_date, 50)
       iq_generator = Rubystats::NormalDistribution.new(100, 20)
+
       players = (1..number_of_players).map { Player.generate(date_generator, iq_generator) }
       quizzes = players.map{|player| player.create_quizzes(Random.new.rand(1..3))}.flatten
       games = generate_games(players, quizzes)

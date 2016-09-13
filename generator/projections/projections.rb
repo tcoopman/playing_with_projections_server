@@ -7,8 +7,8 @@ require 'json'
 require 'pry'
 
 def events(stream_name)
-  # base_uri = 'http://playing-with-projections.herokuapp.com'
-  base_uri = 'http://localhost:4000'
+  base_uri = 'http://playing-with-projections.herokuapp.com'
+  # base_uri = 'http://localhost:4000'
   stream = "#{base_uri}/stream/#{stream_name}"
   puts "Reading from '#{stream}'"
 

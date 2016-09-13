@@ -37,10 +37,15 @@ module Statistics
     def self.generate(author, created_at)
       Quiz.new(
           author,
+          popularity_distribution,
           quiz_id: SecureRandom.uuid,
           owner_id: author.player_id,
           created_at: created_at
       )
+    end
+
+    def self.popularity_distribution
+      Rubystats::NormalDistribution.new(0, 10)
     end
 
     include HashToFields
@@ -49,14 +54,14 @@ module Statistics
 
     attr_reader :author, :questions, :published_at, :popularity
 
-    def initialize(author, options)
+    def initialize(author, popularity_distribution, options)
       @author = author
       @options = options
       @theme = choose_theme
       @options[:quiz_title] = @theme.title
       @questions = (1..5).map{ Question.generate(self, @theme) }
       @published_at = @questions.max(&:created_at).created_at + a_few_minutes
-      @popularity = 1
+      @popularity = popularity_distribution.rng
     end
 
     def choose_theme
