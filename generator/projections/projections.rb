@@ -1,6 +1,6 @@
 require_relative 'stream_reader.rb'
 require_relative 'counter_projections.rb'
-require_relative 'quizzes_created_per_month.rb'
+require_relative 'projections_per_month.rb'
 require_relative 'top_5_projections.rb'
 
 require 'json'
@@ -28,6 +28,12 @@ puts
 
 puts "Quizzes published per month:"
 QuizzesPublishedPerMonth.new.project(events).each do |month, count|
+  puts "#{month}: #{count}"
+end
+puts
+
+puts "Gamesp played per month:"
+GamesPlayedPerMonth.new.project(events).each do |month, count|
   puts "#{month}: #{count}"
 end
 puts

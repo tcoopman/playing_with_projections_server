@@ -2,6 +2,7 @@ module Statistics
   class Player
     def self.generate(date_generator, iq_generator)
       Player.new(
+          activity_distribution.rng,
           player_id: SecureRandom.uuid,
           first_name: Faker::Name.first_name,
           last_name: Faker::Name.last_name,
@@ -10,11 +11,18 @@ module Statistics
       )
     end
 
+    def self.activity_distribution
+      Rubystats::NormalDistribution.new(0, 10)
+    end
+
     include HashToFields
     include EventGenerator
     include TimeHelpers
 
-    def initialize(options)
+    attr_reader :activity
+
+    def initialize(activity, options)
+      @activity = activity
       @options = options
     end
 
