@@ -1,9 +1,10 @@
 require_relative 'stream_reader.rb'
 require_relative 'number_of_quizzes.rb'
 require_relative 'quizzes_created_per_month.rb'
+require_relative 'top5_playing_players.rb'
 
 require 'json'
-require 'rest-client'
+require 'pry'
 
 def events(stream_name)
   base_uri = 'http://playing-with-projections.herokuapp.com'
@@ -17,9 +18,21 @@ end
 stream_name = ARGV.first
 events = events(stream_name)
 
-[
-    NumberOfPublishedQuizzes,
-    QuizzesPublishedPerMonth,
-].each do |projector|
-  puts projector.new.project(events)
+
+
+
+puts
+puts "#{NumberOfPublishedQuizzes.new.project(events)} quizzes published"
+puts
+
+puts "Quizzes published per month:"
+QuizzesPublishedPerMonth.new.project(events).each do |month, count|
+  puts "#{month}: #{count}"
 end
+puts
+
+puts "Players who play the most:"
+Top5PlayingPlayers.new.project(events).each do |player|
+  puts "#{player[:first_name]} #{player[:last_name]}: #{player[:games_played]} games played"
+end
+puts

@@ -11,7 +11,6 @@ file_name = "../data/#{stream_name}.json"
 
 puts "Generating #{file_name}"
 
-# history = HistoryGenerator.new.generate_history(100 + Random.new.rand(100))
 history = Statistics::Generator.new.generate_history
 
 open(file_name, 'w') do |file|
