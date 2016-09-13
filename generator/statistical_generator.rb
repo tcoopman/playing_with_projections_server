@@ -8,7 +8,7 @@ require_relative 'models'
 module Statistics
   class Generator
     def generate_history
-      number_of_players = Random.new.rand(400..1000)
+      number_of_players = Random.new.rand(100..300)
 
       startup_date = DateTime.parse('2016-5-1T08:00:00')
       top_date = startup_date + 150
@@ -26,7 +26,7 @@ module Statistics
     end
 
     def generate_games(players, quizzes)
-      number_of_games = Random.new.rand(5000..10000)
+      number_of_games = Random.new.rand(500..1000)
       weighted_games = weighted_by(quizzes, :popularity)
       weighted_players = weighted_by(players, :activity)
 
