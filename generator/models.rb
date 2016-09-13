@@ -24,11 +24,11 @@ module Statistics
       ]
     end
 
-    def create_quizzes
+    def create_quizzes(number_of_quizzes)
       [
           quiz_1 = Quiz.generate(self, registered_at + a_few_minutes),
           Quiz.generate(self, quiz_1.published_at + a_few_seconds)
-      ] + (1..4).map{ Quiz.generate(self, registered_at + a_few_days) }
+      ] + (1..(number_of_quizzes-1)).map{ Quiz.generate(self, registered_at + a_few_days) }
     end
   end
 
