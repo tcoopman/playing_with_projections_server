@@ -15,5 +15,5 @@ open(file_name, 'w') do |file|
   file.puts JSON.pretty_generate events
 end
 
-
 puts "#{NumberOfRegisteredPlayers.project(events)} players have registered"
+puts "Players registered per month: #{NumberOfRegisteredPlayersPerMonth.project(events).inspect}"
