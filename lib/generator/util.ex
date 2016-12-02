@@ -25,6 +25,9 @@ defmodule Quizzy.Generator.Util do
 
     %Meta{id: id, timestamp: timestamp}
   end
+  def generate_meta(%Timex.AmbiguousDateTime{before: before}) do
+    generate_meta(before)
+  end
 
   def number_to_generate_for_date(distribution, year_month) do
     nb = Map.get(distribution, year_month, 0)

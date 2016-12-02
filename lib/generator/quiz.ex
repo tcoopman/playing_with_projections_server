@@ -22,7 +22,7 @@ defmodule Quizzy.Generator.Quiz do
    |> Map.keys
    |> Util.filter_from_distribution({year, month})
    |> Enum.flat_map(&(Util.generate_days(&1, Util.number_to_generate_for_date(type.quiz_publish_distribution, &1))))
-   |> Enum.map(&(generate_quiz(&1, event)))
+   |> Enum.flat_map(&(generate_quiz(&1, event)))
    |> Enum.map(fn event -> %{type: type, event: event} end) # TODO type of quiz
   end
 
@@ -34,10 +34,10 @@ defmodule Quizzy.Generator.Quiz do
 
     quiz_title = Enum.at(@quiz_titles, (:rand.uniform(10) -1))
 
-    %QuizWasCreated{meta: meta, quiz_id: quiz_id, quiz_title: quiz_title, owner_id: owner_id}
+    quiz = %QuizWasCreated{meta: meta, quiz_id: quiz_id, quiz_title: quiz_title, owner_id: owner_id}
 
 
-    # TODO quiz was published and question added to quiz
+    [quiz]
   end
 
   defp year_month(timestamp) do
