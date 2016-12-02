@@ -22,7 +22,8 @@ class EventGenerator
   def self.QuizWasCreated(data)
     quiz = data[:quiz]
     {
-      quiz: quiz.id
+      quiz: quiz.id,
+      author: quiz.author ? quiz.author.id : nil
     }
   end
 end
