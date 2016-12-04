@@ -117,6 +117,7 @@ defmodule Quizzy.Generator.Quiz do
   defp publish_quiz(%QuizWasCreated{meta: quiz_meta, quiz_id: quiz_id}) do
     timestamp = Timex.add(quiz_meta.timestamp, Timex.Duration.from_minutes(30))
     meta = Util.generate_meta(timestamp)
+
     %QuizWasPublished{meta: meta, quiz_id: quiz_id}
   end
 

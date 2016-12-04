@@ -7,6 +7,13 @@ defmodule Quizzy.Generator do
     players = generate_players()
 
     quizzes = generate_quizzes(players)
+
+    players ++ quizzes
+
+    players ++ quizzes
+    |> Enum.map(fn
+      %{event: event} -> event
+    end)
   end
 
   def generate_players() do
@@ -15,7 +22,7 @@ defmodule Quizzy.Generator do
   end
 
   def generate_quizzes(players) do
-    Enum.map(players, &(Quiz.generate_quizzes(&1)))
+    Enum.flat_map(players, &(Quiz.generate_quizzes(&1)))
   end
 
   def generate_games(players, quizzes) do
