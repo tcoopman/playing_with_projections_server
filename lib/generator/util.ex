@@ -36,4 +36,10 @@ defmodule Quizzy.Generator.Util do
 
     if normalized_number < 0, do: 0, else: normalized_number
   end
+
+  def rand_from_list(list) do
+    length = Enum.count list
+    index = :rand.uniform(length) -1
+    Enum.at(list, index)
+  end
 end

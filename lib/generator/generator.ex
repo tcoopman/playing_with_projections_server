@@ -11,7 +11,7 @@ defmodule Quizzy.Generator do
 
   def generate_players() do
     []
-    |> Enum.concat(Player.generate_players(EarlyAdopter, {2015, 2}))
+    |> Enum.concat(Player.generate_players(EarlyAdopter, {2017, 1}))
   end
 
   def generate_quizzes(players) do
