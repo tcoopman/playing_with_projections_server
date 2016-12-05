@@ -90,13 +90,18 @@ defmodule Quizzy.Generator.Quiz do
     quiz = %QuizWasCreated{meta: meta, quiz_id: quiz_id, quiz_title: quiz_title, owner_id: owner_id}
 
     questions = generate_questions(quiz)
-    publish = publish_quiz(quiz)
 
-    [quiz] ++ questions ++ [publish]
+    if :rand.uniform > 0.1 do
+      publish = publish_quiz(quiz)
+
+      [quiz] ++ questions ++ [publish]
+    else
+      [quiz] ++ questions
+    end
   end
 
   defp generate_questions(%QuizWasCreated{meta: quiz_meta, quiz_id: quiz_id}) do
-    number_of_questions = :rand.uniform(10)
+    number_of_questions = :rand.uniform(5)
     for n <- 0..number_of_questions do
       minutes_to_add = :rand.uniform(20)
       timestamp = Timex.add(quiz_meta.timestamp, Timex.Duration.from_minutes(minutes_to_add))

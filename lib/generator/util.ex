@@ -10,7 +10,7 @@ defmodule Quizzy.Generator.Util do
   def generate_days({year, month}, number_to_generate) do
     end_of_month = Timex.days_in_month(year, month)
 
-    for n <- 1..number_to_generate do
+    for _ <- 1..number_to_generate do
       day = :rand.uniform(end_of_month)
       hours = Kernel.trunc(:rand.uniform()*24)
       minutes = Kernel.trunc(:rand.uniform()*60)

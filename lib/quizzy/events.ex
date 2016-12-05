@@ -77,101 +77,114 @@ defmodule Quizzy.Events do
     defstruct [:meta, :game_id]
   end
 
-    def json_to_event(%{type: type, id: id, timestamp: timestamp, payload: payload}) do
-        case type do
-            "QuizWasCreated" ->
-                %QuizWasCreated{
-                    meta: meta(id, timestamp),
-                      quiz_id: payload.quiz_id,
-                    quiz_title: payload.quiz_title,
-                    owner_id: payload.owner_id
-                }
-            "QuizWasPublished" ->
-                %QuizWasPublished{
-                    meta: meta(id, timestamp),
-                    quiz_id: payload.quiz_id,
-                }
-            "PlayerHasRegistered" ->
-                %PlayerHasRegistered{
-                    meta: meta(id, timestamp),
-                    first_name: payload.first_name,
-                    last_name: payload.last_name,
-                    player_id: payload.player_id
-                }
-            "QuestionAddedToQuiz" ->
-                %QuestionAddedToQuiz{
-                    meta: meta(id, timestamp),
-                    quiz_id: payload.quiz_id,
-                    question_id: payload.question_id,
-                    question: payload.question,
-                    answer: payload.answer
-                }
-            "GameWasOpened" ->
-                %GameWasOpened{
-                    meta: meta(id, timestamp),
-                    quiz_id: payload.quiz_id,
-                    game_id: payload.game_id
-                }
-            "GameWasStarted" ->
-                %GameWasStarted{
-                    meta: meta(id, timestamp),
-                    game_id: payload.game_id
-                }
-            "PlayerJoinedGame" ->
-                %PlayerJoinedGame{
-                    meta: meta(id, timestamp),
-                    game_id: payload.game_id,
-                    player_id: payload.player_id
-                }
-            "PlayerLeftGame" ->
-                %PlayerLeftGame{
-                    meta: meta(id, timestamp),
-                    game_id: payload.game_id,
-                    player_id: payload.player_id
-                }
-            "QuestionWasAsked" ->
-                %QuestionWasAsked{
-                    meta: meta(id, timestamp),
-                    game_id: payload.game_id,
-                    question_id: payload.question_id
+  def event_to_json(%QuizWasCreated{meta: meta, quiz_title: quiz_title, owner_id: owner_id}) do
+    %{type: "QuizWasCreated", id: meta.id, timestamp: meta.timestamp, payload: %{quiz_title: quiz_title, owner_id: owner_id}}
+  end
+  def event_to_json(%QuizWasPublished{meta: meta, quiz_id: quiz_id}) do
+    %{type: "QuizWasPublished", id: meta.id, timestamp: meta.timestamp, payload: %{quiz_id: quiz_id}}
+  end
+  def event_to_json(%QuestionAddedToQuiz{meta: meta, quiz_id: quiz_id, question_id: question_id, question: question, answer: answer}) do
+    %{type: "QuestionAddedToQuiz", id: meta.id, timestamp: meta.timestamp, payload: %{quiz_id: quiz_id, question_id: question_id, question: question, answer: answer}}
+  end
+  def event_to_json(%PlayerHasRegistered{meta: meta, first_name: first_name, last_name: last_name, player_id: player_id}) do
+    %{type: "PlayerHasRegistered", id: meta.id, timestamp: meta.timestamp, payload: %{first_name: first_name, last_name: last_name, player_id: player_id}}
+  end
 
-                }
-            "AnswerWasGiven" ->
-                %AnswerWasGiven{
-                    meta: meta(id, timestamp),
-                    game_id: payload.game_id,
-                    question_id: payload.question_id,
-                    answer: payload.answer
-                }
-            "TimerHasExpired" ->
-                %TimerHasExpired{
-                    meta: meta(id, timestamp),
-                    game_id: payload.game_id,
-                    question_id: payload.question_id,
-                }
-            "QuestionWasCompleted" ->
-                %QuestionWasCompleted{
-                    meta: meta(id, timestamp),
-                    game_id: payload.game_id,
-                    question_id: payload.question_id,
-                }
-            "GameWasFinished" ->
-                %GameWasFinished{
-                    meta: meta(id, timestamp),
-                    game_id: payload.game_id,
-                }
-            "GameWasCancelled" ->
-                %GameWasCancelled{
-                    meta: meta(id, timestamp),
-                    game_id: payload.game_id,
-                }
-        end
-    end
+  def json_to_event(%{type: type, id: id, timestamp: timestamp, payload: payload}) do
+    case type do
+        "QuizWasCreated" ->
+            %QuizWasCreated{
+                meta: meta(id, timestamp),
+                  quiz_id: payload.quiz_id,
+                quiz_title: payload.quiz_title,
+                owner_id: payload.owner_id
+            }
+        "QuizWasPublished" ->
+            %QuizWasPublished{
+                meta: meta(id, timestamp),
+                quiz_id: payload.quiz_id,
+            }
+        "PlayerHasRegistered" ->
+            %PlayerHasRegistered{
+                meta: meta(id, timestamp),
+                first_name: payload.first_name,
+                last_name: payload.last_name,
+                player_id: payload.player_id
+            }
+        "QuestionAddedToQuiz" ->
+            %QuestionAddedToQuiz{
+                meta: meta(id, timestamp),
+                quiz_id: payload.quiz_id,
+                question_id: payload.question_id,
+                question: payload.question,
+                answer: payload.answer
+            }
+        "GameWasOpened" ->
+            %GameWasOpened{
+                meta: meta(id, timestamp),
+                quiz_id: payload.quiz_id,
+                game_id: payload.game_id
+            }
+        "GameWasStarted" ->
+            %GameWasStarted{
+                meta: meta(id, timestamp),
+                game_id: payload.game_id
+            }
+        "PlayerJoinedGame" ->
+            %PlayerJoinedGame{
+                meta: meta(id, timestamp),
+                game_id: payload.game_id,
+                player_id: payload.player_id
+            }
+        "PlayerLeftGame" ->
+            %PlayerLeftGame{
+                meta: meta(id, timestamp),
+                game_id: payload.game_id,
+                player_id: payload.player_id
+            }
+        "QuestionWasAsked" ->
+            %QuestionWasAsked{
+                meta: meta(id, timestamp),
+                game_id: payload.game_id,
+                question_id: payload.question_id
 
-    defp meta(id, timestamp) do
-        %Meta{
-            id: id,
-            timestamp: timestamp
-        }
+            }
+        "AnswerWasGiven" ->
+            %AnswerWasGiven{
+                meta: meta(id, timestamp),
+                game_id: payload.game_id,
+                question_id: payload.question_id,
+                answer: payload.answer
+            }
+        "TimerHasExpired" ->
+            %TimerHasExpired{
+                meta: meta(id, timestamp),
+                game_id: payload.game_id,
+                question_id: payload.question_id,
+            }
+        "QuestionWasCompleted" ->
+            %QuestionWasCompleted{
+                meta: meta(id, timestamp),
+                game_id: payload.game_id,
+                question_id: payload.question_id,
+            }
+        "GameWasFinished" ->
+            %GameWasFinished{
+                meta: meta(id, timestamp),
+                game_id: payload.game_id,
+            }
+        "GameWasCancelled" ->
+            %GameWasCancelled{
+                meta: meta(id, timestamp),
+                game_id: payload.game_id,
+            }
     end
+  end
+
+  defp meta(id, timestamp) do
+      %Meta{
+          id: id,
+          timestamp: timestamp
+      }
+  end
 end

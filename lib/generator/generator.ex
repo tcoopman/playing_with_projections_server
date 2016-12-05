@@ -1,14 +1,14 @@
 defmodule Quizzy.Generator do
   alias Quizzy.Generator.Player
-  alias Quizzy.Generator.Quiz
   alias Quizzy.Generator.Player.EarlyAdopter
+  alias Quizzy.Generator.Quiz
+  alias Quizzy.Generator.Game
+  alias Quizzy.Events.{QuizWasPublished}
 
-  def generate() do
-    players = generate_players()
+  def generate({year, month}) do
+    players = generate_players({year, month})
 
     quizzes = generate_quizzes(players)
-
-    players ++ quizzes
 
     players ++ quizzes
     |> Enum.map(fn
@@ -16,9 +16,9 @@ defmodule Quizzy.Generator do
     end)
   end
 
-  def generate_players() do
+  def generate_players({year, month}) do
     []
-    |> Enum.concat(Player.generate_players(EarlyAdopter, {2017, 1}))
+    |> Enum.concat(Player.generate_players(EarlyAdopter, {year, month}))
   end
 
   def generate_quizzes(players) do
@@ -26,6 +26,11 @@ defmodule Quizzy.Generator do
   end
 
   def generate_games(players, quizzes) do
-
+    quizzes
+    |> Enum.filter(fn
+      %QuizWasPublished{} -> true
+      _ -> false
+    end)
+    |> Enum.flat_map(&(Game.generate_games(&1, players)))
   end
 end
