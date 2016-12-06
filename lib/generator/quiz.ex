@@ -1,5 +1,6 @@
 defmodule Quizzy.Generator.Quiz do
   alias Quizzy.Generator.Util
+  alias Quizzy.Generator.Quiz
   alias Quizzy.Events.{PlayerHasRegistered, QuizWasCreated, QuizWasPublished, QuestionAddedToQuiz}
 
   @quiz_titles [
@@ -71,12 +72,13 @@ defmodule Quizzy.Generator.Quiz do
   def generate_quizzes(%{type: type, event: %PlayerHasRegistered{} = event}) do
    {year, month} = year_month(event.meta.timestamp)
 
-   type.quiz_publish_distribution
+   publish_distribution = Util.numbers_to_date_map(type.quiz_publish_distribution, {year, month}, {2017, 01})
+
+   publish_distribution
    |> Map.keys
    |> Util.filter_from_distribution({year, month})
-   |> Enum.flat_map(&(Util.generate_days(&1, Util.number_to_generate_for_date(type.quiz_publish_distribution, &1))))
-   |> Enum.flat_map(&(generate_quiz(&1, event)))
-   |> Enum.map(fn event -> %{type: type, event: event} end) # TODO type of quiz
+   |> Enum.flat_map(&(Util.generate_days(&1, Util.number_to_generate_for_date(publish_distribution, &1))))
+   |> Enum.map(&(generate_quiz(&1, event)))
   end
 
   defp generate_quiz(timestamp, event) do
@@ -90,19 +92,22 @@ defmodule Quizzy.Generator.Quiz do
     quiz = %QuizWasCreated{meta: meta, quiz_id: quiz_id, quiz_title: quiz_title, owner_id: owner_id}
 
     questions = generate_questions(quiz)
+    type_of_quiz = pick_type_of_quiz()
 
-    if :rand.uniform > 0.1 do
+    events = if :rand.uniform > 0.1 do
       publish = publish_quiz(quiz)
 
       [quiz] ++ questions ++ [publish]
     else
       [quiz] ++ questions
     end
+
+    %{type: type_of_quiz, events: events}
   end
 
   defp generate_questions(%QuizWasCreated{meta: quiz_meta, quiz_id: quiz_id}) do
-    number_of_questions = :rand.uniform(5)
-    for n <- 0..number_of_questions do
+    number_of_questions = :rand.uniform(3)
+    for _ <- 0..number_of_questions do
       minutes_to_add = :rand.uniform(20)
       timestamp = Timex.add(quiz_meta.timestamp, Timex.Duration.from_minutes(minutes_to_add))
       question_id = UUID.uuid4()
@@ -112,7 +117,7 @@ defmodule Quizzy.Generator.Quiz do
       %QuestionAddedToQuiz{
         meta: meta,
         question_id: question_id,
-        quiz_id: quiz_meta.id,
+        quiz_id: quiz_id,
         question: question,
         answer: answer
       }
@@ -136,5 +141,15 @@ defmodule Quizzy.Generator.Quiz do
 
   defp answer_for_question(question) do
     :crypto.hash(:sha, question) |> Base.encode16 |> String.downcase
+  end
+
+  defp pick_type_of_quiz do
+    distribution = :rand.uniform
+    cond do
+      distribution <= 0.8 -> Quiz.OneHitWonder
+      distribution <= 0.9 -> Quiz.NoPlayers
+      distribution <= 0.95 -> Quiz.Popular
+      distribution <= 1 -> Quiz.Niche
+    end
   end
 end

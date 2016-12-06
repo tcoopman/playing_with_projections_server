@@ -10,14 +10,17 @@ defmodule Quizzy.Generator.Util do
   def generate_days({year, month}, number_to_generate) do
     end_of_month = Timex.days_in_month(year, month)
 
-    for _ <- 1..number_to_generate do
-      day = :rand.uniform(end_of_month)
-      hours = Kernel.trunc(:rand.uniform()*24)
-      minutes = Kernel.trunc(:rand.uniform()*60)
-      seconds = Kernel.trunc(:rand.uniform()*60)
-      Timex.to_datetime({{year, month, day}, {hours, minutes, seconds}}, "Europe/Brussels")
+    case number_to_generate do
+      0 -> []
+      _ ->
+        for _ <- 0..number_to_generate do
+          day = :rand.uniform(end_of_month)
+          hours = Kernel.trunc(:rand.uniform()*24)
+          minutes = Kernel.trunc(:rand.uniform()*60)
+          seconds = Kernel.trunc(:rand.uniform()*60)
+          Timex.to_datetime({{year, month, day}, {hours, minutes, seconds}}, "Europe/Brussels")
+        end
     end
-
   end
 
   def generate_meta(%DateTime{} = timestamp) do
@@ -41,5 +44,21 @@ defmodule Quizzy.Generator.Util do
     length = Enum.count list
     index = :rand.uniform(length) -1
     Enum.at(list, index)
+  end
+
+  def numbers_to_date_map(numbers,{year, month} = start, {year2, month2} = until, result \\ %{}) do
+    cond do
+      year >= year2 && month >= month2 -> result
+      true ->
+        {current_number, remaining_numbers} =
+          case numbers do
+            [] -> {0, []}
+            [hd|tail] -> {hd, tail}
+          end
+
+        result = Map.put(result, start, current_number)
+        new_start_date = Timex.add({year, month, 1}, Timex.Duration.from_days(31)) |> Timex.to_date
+        numbers_to_date_map(remaining_numbers, {new_start_date.year, new_start_date.month}, until, result)
+    end
   end
 end

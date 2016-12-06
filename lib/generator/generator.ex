@@ -11,8 +11,9 @@ defmodule Quizzy.Generator do
     quizzes = generate_quizzes(players)
 
     players ++ quizzes
-    |> Enum.map(fn
-      %{event: event} -> event
+    |> Enum.flat_map(fn
+      %{event: event} -> [event]
+      %{events: events} -> events
     end)
   end
 
