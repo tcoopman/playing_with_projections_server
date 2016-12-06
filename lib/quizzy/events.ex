@@ -89,6 +89,9 @@ defmodule Quizzy.Events do
   def event_to_json(%PlayerHasRegistered{meta: meta, first_name: first_name, last_name: last_name, player_id: player_id}) do
     %{type: "PlayerHasRegistered", id: meta.id, timestamp: meta.timestamp, payload: %{first_name: first_name, last_name: last_name, player_id: player_id}}
   end
+  def event_to_json(%GameWasOpened{meta: meta, quiz_id: quiz_id, game_id: game_id}) do
+    %{type: "GameWasOpened", id: meta.id, timestamp: meta.timestamp, payload: %{quiz_id: quiz_id, game_id: game_id}}
+  end
 
   def json_to_event(%{type: type, id: id, timestamp: timestamp, payload: payload}) do
     case type do

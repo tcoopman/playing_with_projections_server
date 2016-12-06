@@ -78,6 +78,7 @@ defmodule Quizzy.Generator.Quiz do
    |> Map.keys
    |> Util.filter_from_distribution({year, month})
    |> Enum.flat_map(&(Util.generate_days(&1, Util.number_to_generate_for_date(publish_distribution, &1))))
+   |> Enum.filter(fn timestamp -> Timex.after?(timestamp, event.meta.timestamp) end)
    |> Enum.map(&(generate_quiz(&1, event)))
   end
 
@@ -146,6 +147,7 @@ defmodule Quizzy.Generator.Quiz do
   defp pick_type_of_quiz do
     distribution = :rand.uniform
     cond do
+      distribution <= 0.5 -> Quiz.SinglePlay
       distribution <= 0.8 -> Quiz.OneHitWonder
       distribution <= 0.9 -> Quiz.NoPlayers
       distribution <= 0.95 -> Quiz.Popular

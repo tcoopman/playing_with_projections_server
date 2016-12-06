@@ -10,10 +10,15 @@ defmodule Quizzy.Generator do
 
     quizzes = generate_quizzes(players)
 
-    players ++ quizzes
+    games = generate_games(players, quizzes)
+
+    IO.inspect games
+
+    players ++ quizzes ++ games
     |> Enum.flat_map(fn
       %{event: event} -> [event]
       %{events: events} -> events
+      event -> [event]
     end)
   end
 
@@ -27,11 +32,6 @@ defmodule Quizzy.Generator do
   end
 
   def generate_games(players, quizzes) do
-    quizzes
-    |> Enum.filter(fn
-      %QuizWasPublished{} -> true
-      _ -> false
-    end)
-    |> Enum.flat_map(&(Game.generate_games(&1, players)))
+    Game.generate_games(quizzes, players)
   end
 end
