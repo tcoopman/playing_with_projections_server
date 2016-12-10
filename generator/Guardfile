@@ -1,3 +1,4 @@
-guard :rspec, cmd: 'rspec' do
-  watch(%r{^spec/.+_spec\.rb$})
+guard 'rake', :task => 'projections' do
+  watch(%r{^.rb})
+  watch(%r{^projections/.+\.rb$})
 end

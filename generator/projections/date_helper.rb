@@ -1,3 +1,5 @@
+require 'date'
+
 module DateHelper
   def month_of(quiz)
     date = DateTime.parse(quiz['timestamp'])
