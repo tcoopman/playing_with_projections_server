@@ -30,4 +30,10 @@ defmodule Quizzy.Generator.Player.EarlyAdopter do
       distribution <= 1 -> @rising
     end
   end
+
+  def chance_of_playing do
+    #TODO don't add a type of player, but add all the metadata at generation. Like that we don't don't generate a new distribution every time
+    #
+    [0.05, 0.01, 0.001, 0]
+  end
 end

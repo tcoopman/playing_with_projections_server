@@ -14,7 +14,7 @@ defmodule Quizzy.Events do
 
   defmodule QuizWasPublished do
     @enforce_keys [:meta, :quiz_id]
-    defstruct [:meta, :quiz_id]
+    defstruct [:meta, :quiz_id, :secret_questions]
   end
 
   defmodule PlayerHasRegistered do
@@ -77,8 +77,8 @@ defmodule Quizzy.Events do
     defstruct [:meta, :game_id]
   end
 
-  def event_to_json(%QuizWasCreated{meta: meta, quiz_title: quiz_title, owner_id: owner_id}) do
-    %{type: "QuizWasCreated", id: meta.id, timestamp: meta.timestamp, payload: %{quiz_title: quiz_title, owner_id: owner_id}}
+  def event_to_json(%QuizWasCreated{meta: meta, quiz_id: quiz_id, quiz_title: quiz_title, owner_id: owner_id}) do
+    %{type: "QuizWasCreated", id: meta.id, timestamp: meta.timestamp, payload: %{quiz_id: quiz_id, quiz_title: quiz_title, owner_id: owner_id}}
   end
   def event_to_json(%QuizWasPublished{meta: meta, quiz_id: quiz_id}) do
     %{type: "QuizWasPublished", id: meta.id, timestamp: meta.timestamp, payload: %{quiz_id: quiz_id}}
@@ -91,6 +91,21 @@ defmodule Quizzy.Events do
   end
   def event_to_json(%GameWasOpened{meta: meta, quiz_id: quiz_id, game_id: game_id}) do
     %{type: "GameWasOpened", id: meta.id, timestamp: meta.timestamp, payload: %{quiz_id: quiz_id, game_id: game_id}}
+  end
+  def event_to_json(%GameWasCancelled{meta: meta, game_id: game_id}) do
+    %{type: "GameWasCancelled", id: meta.id, timestamp: meta.timestamp, payload: %{game_id: game_id}}
+  end
+  def event_to_json(%GameWasStarted{meta: meta, game_id: game_id}) do
+    %{type: "GameWasStarted", id: meta.id, timestamp: meta.timestamp, payload: %{game_id: game_id}}
+  end
+  def event_to_json(%PlayerJoinedGame{meta: meta, game_id: game_id, player_id: player_id}) do
+    %{type: "PlayerJoinedGame", id: meta.id, timestamp: meta.timestamp, payload: %{game_id: game_id, player_id: player_id}}
+  end
+  def event_to_json(%QuestionWasAsked{meta: meta, game_id: game_id, question_id: question_id}) do
+    %{type: "QuestionWasAsked", id: meta.id, timestamp: meta.timestamp, payload: %{game_id: game_id, question_id: question_id}}
+  end
+  def event_to_json(%GameWasFinished{meta: meta, game_id: game_id}) do
+    %{type: "GameWasFinished", id: meta.id, timestamp: meta.timestamp, payload: %{game_id: game_id}}
   end
 
   def json_to_event(%{type: type, id: id, timestamp: timestamp, payload: payload}) do

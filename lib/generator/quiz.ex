@@ -1,4 +1,5 @@
 defmodule Quizzy.Generator.Quiz do
+  alias Quizzy.Generator.Player.TypeOfPlayer
   alias Quizzy.Generator.Util
   alias Quizzy.Generator.Quiz
   alias Quizzy.Events.{PlayerHasRegistered, QuizWasCreated, QuizWasPublished, QuestionAddedToQuiz}
@@ -69,10 +70,10 @@ defmodule Quizzy.Generator.Quiz do
     "I think I will buy the red car, or I will lease the blue one.",
   ]
 
-  def generate_quizzes(%{type: type, event: %PlayerHasRegistered{} = event}) do
-   {year, month} = year_month(event.meta.timestamp)
+  def generate_quizzes(%{type: %TypeOfPlayer{quiz_publish_distribution: quiz_publish_distribution}, event: %PlayerHasRegistered{} = event}) do
+   {year, month} = Util.year_month(event.meta.timestamp)
 
-   publish_distribution = Util.numbers_to_date_map(type.quiz_publish_distribution, {year, month}, {2017, 01})
+   publish_distribution = Util.numbers_to_date_map(quiz_publish_distribution, {year, month}, {2017, 01})
 
    publish_distribution
    |> Map.keys
@@ -96,7 +97,7 @@ defmodule Quizzy.Generator.Quiz do
     type_of_quiz = pick_type_of_quiz()
 
     events = if :rand.uniform > 0.1 do
-      publish = publish_quiz(quiz)
+      publish = publish_quiz(quiz, questions)
 
       [quiz] ++ questions ++ [publish]
     else
@@ -125,19 +126,11 @@ defmodule Quizzy.Generator.Quiz do
     end
   end
 
-  defp publish_quiz(%QuizWasCreated{meta: quiz_meta, quiz_id: quiz_id}) do
+  defp publish_quiz(%QuizWasCreated{meta: quiz_meta, quiz_id: quiz_id}, questions) do
     timestamp = Timex.add(quiz_meta.timestamp, Timex.Duration.from_minutes(30))
     meta = Util.generate_meta(timestamp)
 
-    %QuizWasPublished{meta: meta, quiz_id: quiz_id}
-  end
-
-  defp year_month(timestamp) do
-   date = Timex.to_date(timestamp)
-   year = date.year
-   month = date.month
-
-   {year, month}
+    %QuizWasPublished{meta: meta, quiz_id: quiz_id, secret_questions: questions}
   end
 
   defp answer_for_question(question) do

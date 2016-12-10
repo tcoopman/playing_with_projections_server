@@ -1,4 +1,5 @@
 defmodule Quizzy.Generator.Player do
+  alias Quizzy.Generator.Player.TypeOfPlayer
   alias Quizzy.Generator.Util
   alias Quizzy.Events.{PlayerHasRegistered, Meta}
 
@@ -55,13 +56,13 @@ defmodule Quizzy.Generator.Player do
       "Mitchell Haun",
     ]
 
-  def generate_players(type, {year, month}) do
-    type.register_distribution
+  def generate_players(register_distribution, type_generator, {year, month}) do
+    register_distribution
     |> Map.keys
     |> Util.filter_from_distribution({year, month})
-    |> Enum.flat_map(&(Util.generate_days(&1, Util.number_to_generate_for_date(type.register_distribution, &1))))
+    |> Enum.flat_map(&(Util.generate_days(&1, Util.number_to_generate_for_date(register_distribution, &1))))
     |> Enum.map(&generate_player/1)
-    |> Enum.map(fn event -> %{type: type, event: event} end)
+    |> Enum.map(fn event -> %{type: type_generator.(), event: event} end)
   end
 
   defp generate_player(timestamp) do

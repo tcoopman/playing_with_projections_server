@@ -46,6 +46,9 @@ defmodule Quizzy.Generator.Util do
     Enum.at(list, index)
   end
 
+  def numbers_to_date_map(%{} = already_distribution, _, _) do
+    already_distribution
+  end
   def numbers_to_date_map(numbers,{year, month} = start, {year2, month2} = until, result \\ %{}) do
     cond do
       year >= year2 && month >= month2 -> result
@@ -61,4 +64,18 @@ defmodule Quizzy.Generator.Util do
         numbers_to_date_map(remaining_numbers, {new_start_date.year, new_start_date.month}, until, result)
     end
   end
+
+  def random_timestamp_after_minutes(timestamp, max_minutes) do
+      minutes_to_add = :rand.uniform(max_minutes)
+      Timex.add(timestamp, Timex.Duration.from_minutes(minutes_to_add))
+  end
+
+  def year_month(timestamp) do
+   date = Timex.to_date(timestamp)
+   year = date.year
+   month = date.month
+
+   {year, month}
+  end
+
 end

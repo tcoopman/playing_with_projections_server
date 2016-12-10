@@ -1,6 +1,6 @@
 defmodule Quizzy.Generator do
   alias Quizzy.Generator.Player
-  alias Quizzy.Generator.Player.EarlyAdopter
+  alias Quizzy.Generator.Player.TypeOfPlayer
   alias Quizzy.Generator.Quiz
   alias Quizzy.Generator.Game
   alias Quizzy.Events.{QuizWasPublished}
@@ -12,8 +12,6 @@ defmodule Quizzy.Generator do
 
     games = generate_games(players, quizzes)
 
-    IO.inspect games
-
     players ++ quizzes ++ games
     |> Enum.flat_map(fn
       %{event: event} -> [event]
@@ -24,7 +22,7 @@ defmodule Quizzy.Generator do
 
   def generate_players({year, month}) do
     []
-    |> Enum.concat(Player.generate_players(EarlyAdopter, {year, month}))
+    |> Enum.concat(Player.generate_players(TypeOfPlayer.early_adoption, &try_out_publish_never_play/0, {year, month}))
   end
 
   def generate_quizzes(players) do
@@ -33,5 +31,26 @@ defmodule Quizzy.Generator do
 
   def generate_games(players, quizzes) do
     Game.generate_games(quizzes, players)
+  end
+
+  defp try_out_publish_never_play do
+    quiz_publish_distribution_picker = :rand.uniform
+
+    quiz_publish_distribution = cond do
+      quiz_publish_distribution_picker <= 1 -> TypeOfPlayer.try_out
+    end
+
+    quiz_playing_distribution_picker = :rand.uniform
+
+    quiz_playing_distribution = cond do
+      quiz_playing_distribution_picker <= 0.8 -> TypeOfPlayer.never_player
+      quiz_playing_distribution_picker <= 1 -> TypeOfPlayer.try_out_player
+    end
+
+
+    %TypeOfPlayer{
+      quiz_publish_distribution: quiz_publish_distribution,
+      quiz_playing_distribution: quiz_playing_distribution
+    }
   end
 end
