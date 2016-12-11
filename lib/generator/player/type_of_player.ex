@@ -51,15 +51,16 @@ defmodule Quizzy.Generator.Player.TypeOfPlayer do
   def try_out, do: [5]
   def dropping, do: [5, 3, 1]
   def dropping_slowly, do: [5, 4, 3, 2, 1]
-  def steady, do: Enum.map(1..37, const(2))
+  def steady, do: Enum.map(1..37, fn _ -> 2 end)
   def rising, do: Enum.map(1..37, &(&1))
   def never, do: []
 
   # play_game_distribution
-  def steady_big_player, do: Enum.map(1..37, const(20))
-  def steady_player, do: Enum.map(1..37, const(10))
-  def steady_small_player, do: Enum.map(1..37, const(2))
-  def try_out_player, do: [20, 5, 1]
+  def bot_always_player, do: Enum.map(1..37, fn _ -> 100_000 end)
+  def steady_big_player, do: Enum.map(1..37, fn _ -> 100 end)
+  def steady_player, do: Enum.map(1..37, fn _ -> 50 end)
+  def steady_small_player, do: Enum.map(1..37, fn _ -> 10 end)
+  def try_out_player, do: [100, 30, 10]
   def never_player, do: []
   def targeting_campaign_succeeds do
     %{
@@ -185,6 +186,4 @@ defmodule Quizzy.Generator.Player.TypeOfPlayer do
       {2017, 01}  => 0,
     }
   end
-
-  defp const(item), do: item
 end

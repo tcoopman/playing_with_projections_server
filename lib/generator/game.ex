@@ -28,11 +28,18 @@ defmodule Quizzy.Generator.Game do
         |> Enum.flat_map(&(open_games(type, &1)))
     end)
 
+    opened_games_events = Enum.map(opened_games, fn {_, opened_game} -> opened_game end)
+
+    opened_games_per_month = count_opened_games_per_month(opened_games_events)
+
     played_games = opened_games
     |> Enum.flat_map(fn {questions, opened_game} ->
       possible_players = filter_players(opened_game, all_registered_players)
 
-      joined_players = join_game(opened_game, possible_players)
+      month_of_opened_game = Util.year_month(opened_game.meta.timestamp)
+      number_opened_games_this_month = Map.get(opened_games_per_month, month_of_opened_game, 0)
+
+      joined_players = join_game(opened_game, number_opened_games_this_month, possible_players)
 
       if (Enum.empty?(joined_players)) do
         game_was_cancelled_meta = Util.generate_meta(Timex.add(opened_game.meta.timestamp, Timex.Duration.from_minutes(10)))
@@ -48,8 +55,6 @@ defmodule Quizzy.Generator.Game do
       end
 
     end)
-
-    opened_games_events = Enum.map(opened_games, fn {_, opened_game} -> opened_game end)
 
     opened_games_events ++ played_games
   end
@@ -82,7 +87,9 @@ defmodule Quizzy.Generator.Game do
       end)
   end
 
-  defp join_game(%GameWasOpened{meta: meta, game_id: game_id}, players) do
+  defp join_game(
+       %GameWasOpened{meta: meta, game_id: game_id},
+       number_opened_games_this_month, players) do
     year_month_game_opened = Util.year_month(meta.timestamp)
 
     players
@@ -91,7 +98,8 @@ defmodule Quizzy.Generator.Game do
         year_month_player_joined = Util.year_month(player_registered_meta.timestamp)
         quiz_playing_distribution_dates = Util.numbers_to_date_map(quiz_playing_distribution, year_month_player_joined, {2017, 01})
 
-        chance_of_playing_in_this_month = Map.get(quiz_playing_distribution_dates, year_month_game_opened, 0)
+        number_of_games_playing_this_month = Map.get(quiz_playing_distribution_dates, year_month_game_opened, 0)
+        chance_of_playing_in_this_month = number_of_games_playing_this_month / number_opened_games_this_month
         if :rand.uniform < chance_of_playing_in_this_month do
           timestamp = Util.random_timestamp_after_minutes(meta.timestamp, 5)
           joined_meta = Util.generate_meta(timestamp)
@@ -171,5 +179,13 @@ defmodule Quizzy.Generator.Game do
     else
       Quiz.answer_for_question(incorrect_answer)
     end
+  end
+
+  defp count_opened_games_per_month(opened_games) do
+    Enum.reduce(opened_games, %{}, fn
+      %GameWasOpened{meta: %{timestamp: timestamp}}, acc ->
+        key = Util.year_month(timestamp)
+        Map.update(acc, key, 0, fn x -> x + 1 end)
+    end)
   end
 end

@@ -134,7 +134,7 @@ defmodule Quizzy.Generator.Quiz do
   end
 
   def answer_for_question(question) do
-    :crypto.hash(:md5, question) |> Base.encode16 |> String.downcase |> String.slice(0..6)
+    :crypto.hash(:md5, question) |> Base.encode16 |> String.downcase |> String.slice(0..5)
   end
 
   defp pick_type_of_quiz do
