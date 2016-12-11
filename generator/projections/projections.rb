@@ -58,7 +58,7 @@ def run(stream_name)
   end
   puts
 
-  date = DateTime.parse('2014-06-14')
+  date = DateTime.parse('2014-09-14')
   puts "Active players on #{date}"
   player_activity = PlayerActivity.new(events, date)
   player_activity.active_on.each do |activity|

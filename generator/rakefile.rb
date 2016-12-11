@@ -1,5 +1,5 @@
 task :projections do
   Dir[File.dirname(__FILE__) + '/projections/*.rb'].each {|file| load file }
-  run('../data/test3.json')
+  run('../data/test2.json')
 end
 
