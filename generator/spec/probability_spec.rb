@@ -7,6 +7,8 @@ describe Statistics::Generator do
       subject.weighted_by(array, attribute)
     end
 
+    let(:minus){ SimpleType.new(-1) }
+    let(:zero){ SimpleType.new(0) }
     let(:one){ SimpleType.new(1) }
     let(:two){ SimpleType.new(2) }
 
@@ -14,6 +16,10 @@ describe Statistics::Generator do
     it { expect(sample([one], :foo)).to eq [one] }
     it { expect(sample([one, one], :foo)).to eq [one, one] }
     it { expect(sample([one, two], :foo)).to eq [one, two, two] }
+
+    it { expect(sample([zero], :foo)).to eq [] }
+    it { expect(sample([minus], :foo)).to eq [] }
+    it { expect(sample([minus, zero, one, two], :foo)).to eq [one, two, two] }
   end
 end
 

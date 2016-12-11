@@ -26,7 +26,7 @@ module Statistics
           lambda{ "The battle of #{Faker::StarWars.planet}" },
           lambda{ "#{Faker::StarWars.character}'s quiz" },
           lambda{ "The #{Faker::StarWars.planet} quiz" },
-          lambda{ "Only for #{Faker::StarWars.species}s" },
+          lambda{ "Only for #{Faker::StarWars.specie}s" },
           lambda{ Faker::StarWars.quote },
       ].sample.call
     end

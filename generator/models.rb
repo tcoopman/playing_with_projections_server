@@ -2,6 +2,7 @@ module Statistics
   class Player
     def self.generate(date_generator, iq_generator)
       Player.new(
+          activity_distribution.rng,
           player_id: SecureRandom.uuid,
           first_name: Faker::Name.first_name,
           last_name: Faker::Name.last_name,
@@ -10,11 +11,18 @@ module Statistics
       )
     end
 
+    def self.activity_distribution
+      Rubystats::NormalDistribution.new(0, 10)
+    end
+
     include HashToFields
     include EventGenerator
     include TimeHelpers
 
-    def initialize(options)
+    attr_reader :activity
+
+    def initialize(activity, options)
+      @activity = activity
       @options = options
     end
 
@@ -24,11 +32,11 @@ module Statistics
       ]
     end
 
-    def create_quizzes
+    def create_quizzes(number_of_quizzes)
       [
           quiz_1 = Quiz.generate(self, registered_at + a_few_minutes),
           Quiz.generate(self, quiz_1.published_at + a_few_seconds)
-      ] + (1..4).map{ Quiz.generate(self, registered_at + a_few_days) }
+      ] + (1..(number_of_quizzes-1)).map{ Quiz.generate(self, registered_at + a_few_days) }
     end
   end
 
@@ -37,10 +45,15 @@ module Statistics
     def self.generate(author, created_at)
       Quiz.new(
           author,
+          popularity_distribution,
           quiz_id: SecureRandom.uuid,
           owner_id: author.player_id,
           created_at: created_at
       )
+    end
+
+    def self.popularity_distribution
+      Rubystats::NormalDistribution.new(0, 10)
     end
 
     include HashToFields
@@ -49,14 +62,14 @@ module Statistics
 
     attr_reader :author, :questions, :published_at, :popularity
 
-    def initialize(author, options)
+    def initialize(author, popularity_distribution, options)
       @author = author
       @options = options
       @theme = choose_theme
       @options[:quiz_title] = @theme.title
       @questions = (1..5).map{ Question.generate(self, @theme) }
       @published_at = @questions.max(&:created_at).created_at + a_few_minutes
-      @popularity = 1
+      @popularity = popularity_distribution.rng
     end
 
     def choose_theme
