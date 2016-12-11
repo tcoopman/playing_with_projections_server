@@ -10,11 +10,11 @@ class Top5PlayingPlayers
 
         data = hash[player_id]
         if event.type == 'PlayerHasRegistered'
-          data.player_id = payload['player_id']
-          data.first_name = payload['first_name']
-          data.last_name = payload['last_name']
+          data.player_id = payload.player_id
+          data.first_name = payload.first_name
+          data.last_name = payload.last_name
         end
-        if event['type'] == 'PlayerJoinedGame'
+        if event.type == 'PlayerJoinedGame'
           data.games_played += 1
         end
       end
