@@ -48,13 +48,13 @@ def run(stream_name)
 
   puts "Players who play the most:"
   Top5PlayingPlayers.new.project(events).each do |player|
-    puts "#{player.first_name} #{player.last_name} played #{player[:games_played]} games"
+    puts "(#{player.player_id}) #{player.first_name} #{player.last_name} played #{player[:games_played]} games"
   end
   puts
 
   puts "Most played quizzes:"
   Top5PlayedQuizzes.new.project(events).each do |quiz|
-    puts "#{quiz[:quiz_title]}: played #{quiz[:count]} times"
+    puts "(#{quiz[:quiz_id]})#{quiz[:quiz_title]}: played #{quiz[:count]} times"
   end
   puts
 
