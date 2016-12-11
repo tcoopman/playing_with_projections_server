@@ -59,15 +59,15 @@ def run(stream_name)
   puts
 
   date = DateTime.parse('2014-09-14')
-  puts "Active players on #{date}"
   player_activity = PlayerActivity.new(events, date)
-  player_activity.active_on.each do |activity|
-    puts "#{activity.player.first_name} #{activity.player.last_name}: #{activity.games_played} games played"
+  puts "#{player_activity.active.count} active players on #{date}"
+  player_activity.active.each do |activity|
+    puts "(#{activity.player.player_id}) #{activity.player.first_name} #{activity.player.last_name}: #{activity.games_played} games played"
   end
   puts
-  puts "Inactive players on #{date}"
-  player_activity.inactive_on.each do |activity|
-    puts "#{activity.player.first_name} #{activity.player.last_name}: #{activity.games_played} games played"
+  puts "#{player_activity.inactive.count} inactive players on #{date}"
+  player_activity.inactive.each do |activity|
+    puts "(#{activity.player.player_id}) #{activity.player.first_name} #{activity.player.last_name}: #{activity.games_played} games played"
   end
 
 end

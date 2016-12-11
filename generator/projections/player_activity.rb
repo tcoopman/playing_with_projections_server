@@ -8,12 +8,12 @@ class PlayerActivity
     @player_activity = player_activity_on(date)
   end
 
-  def active_on
+  def active
     @player_activity.select{|e| e.games_played > 10}
 
   end
 
-  def inactive_on
+  def inactive
     @player_activity.select{|e| e.games_played < 1}
 
   end
