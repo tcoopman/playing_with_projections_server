@@ -3,6 +3,8 @@ require 'awesome_print'
 class PlayerActivity
   def initialize(events, date)
     @events = events
+    @date = date.to_date
+    @week_before = @date - 7
     @player_activity = player_activity_on(date)
   end
 
@@ -30,11 +32,12 @@ class PlayerActivity
 
   def join_events_on(date)
     @events.select { |e| e.type == 'PlayerJoinedGame' }
-           .select { |e| in_range(date, e.timestamp) }
+           .select { |e| in_range(e.timestamp) }
            .map(&:payload)
   end
 
-  def in_range(reference_date, other_date)
-    reference_date.year == other_date.year && reference_date.month == other_date.month
+  def in_range(date)
+    @week_before < date && date <= @date
+    # reference_date.year == other_date.year && reference_date.month == other_date.month
   end
 end
