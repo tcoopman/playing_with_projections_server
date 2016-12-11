@@ -1,19 +1,20 @@
 require 'awesome_print'
 
 class PlayerActivity
-  def initialize(events)
+  def initialize(events, date)
     @events = events
+    @date = date
     @players = @events.select { |e| e.type == 'PlayerHasRegistered' }
                   .map(&:payload)
   end
 
-  def active_on(date)
-    player_activity_on(date).select{|e| e.games_played > 10}
+  def active_on
+    player_activity_on(@date).select{|e| e.games_played > 10}
 
   end
 
-  def inactive_on(date)
-    player_activity_on(date).select{|e| e.games_played < 1}
+  def inactive_on
+    player_activity_on(@date).select{|e| e.games_played < 1}
 
   end
 

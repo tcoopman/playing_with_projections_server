@@ -1,7 +1,7 @@
 require_relative 'counter_projections.rb'
 require_relative 'projections_per_month.rb'
 require_relative 'top_5_projections.rb'
-require_relative 'active_players.rb'
+require_relative 'player_activity.rb'
 
 require 'json'
 require 'pry'
@@ -60,13 +60,13 @@ def run(stream_name)
 
   date = DateTime.parse('2014-06-14')
   puts "Active players on #{date}"
-  player_activity = PlayerActivity.new(events)
-  player_activity.active_on(date).each do |activity|
+  player_activity = PlayerActivity.new(events, date)
+  player_activity.active_on.each do |activity|
     puts "#{activity.player.first_name} #{activity.player.last_name}: #{activity.games_played} games played"
   end
   puts
   puts "Inactive players on #{date}"
-  player_activity.inactive_on(date).each do |activity|
+  player_activity.inactive_on.each do |activity|
     puts "#{activity.player.first_name} #{activity.player.last_name}: #{activity.games_played} games played"
   end
 
