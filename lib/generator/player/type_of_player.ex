@@ -1,6 +1,6 @@
 defmodule Quizzy.Generator.Player.TypeOfPlayer do
-  @enforce_keys [:quiz_publish_distribution, :quiz_playing_distribution]
-  defstruct [:quiz_publish_distribution, :quiz_playing_distribution]
+  @enforce_keys [:quiz_publish_distribution, :quiz_playing_distribution, :answer_speed, :answer_correctness]
+  defstruct [:quiz_publish_distribution, :quiz_playing_distribution, :answer_speed, :answer_correctness]
 
   # register distribution
 

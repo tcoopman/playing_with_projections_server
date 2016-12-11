@@ -53,13 +53,13 @@ defmodule Quizzy.Events do
   end
 
   defmodule AnswerWasGiven do
-    @enforce_keys [:meta, :game_id, :question_id, :answer]
-    defstruct [:meta, :game_id, :question_id, :answer]
+    @enforce_keys [:meta, :game_id, :question_id, :answer, :player_id]
+    defstruct [:meta, :game_id, :question_id, :answer, :player_id]
   end
 
   defmodule TimerHasExpired do
-    @enforce_keys [:meta, :game_id, :question_id]
-    defstruct [:meta, :game_id, :question_id]
+    @enforce_keys [:meta, :game_id, :question_id, :player_id]
+    defstruct [:meta, :game_id, :question_id, :player_id]
   end
 
   defmodule QuestionWasCompleted do
@@ -104,8 +104,17 @@ defmodule Quizzy.Events do
   def event_to_json(%QuestionWasAsked{meta: meta, game_id: game_id, question_id: question_id}) do
     %{type: "QuestionWasAsked", id: meta.id, timestamp: meta.timestamp, payload: %{game_id: game_id, question_id: question_id}}
   end
+  def event_to_json(%QuestionWasCompleted{meta: meta, game_id: game_id, question_id: question_id}) do
+    %{type: "QuestionWasCompleted", id: meta.id, timestamp: meta.timestamp, payload: %{game_id: game_id, question_id: question_id}}
+  end
   def event_to_json(%GameWasFinished{meta: meta, game_id: game_id}) do
     %{type: "GameWasFinished", id: meta.id, timestamp: meta.timestamp, payload: %{game_id: game_id}}
+  end
+  def event_to_json(%AnswerWasGiven{meta: meta, game_id: game_id, question_id: question_id, player_id: player_id, answer: answer}) do
+    %{type: "AnswerWasGiven", id: meta.id, timestamp: meta.timestamp, payload: %{game_id: game_id, question_id: question_id, player_id: player_id, answer: answer}}
+  end
+  def event_to_json(%TimerHasExpired{meta: meta, game_id: game_id, question_id: question_id, player_id: player_id}) do
+    %{type: "TimerHasExpired", id: meta.id, timestamp: meta.timestamp, payload: %{game_id: game_id, question_id: question_id, player_id: player_id}}
   end
 
   def json_to_event(%{type: type, id: id, timestamp: timestamp, payload: payload}) do
@@ -172,13 +181,15 @@ defmodule Quizzy.Events do
                 meta: meta(id, timestamp),
                 game_id: payload.game_id,
                 question_id: payload.question_id,
-                answer: payload.answer
+                answer: payload.answer,
+                player_id: payload.player_id
             }
         "TimerHasExpired" ->
             %TimerHasExpired{
                 meta: meta(id, timestamp),
                 game_id: payload.game_id,
                 question_id: payload.question_id,
+                player_id: payload.player_id
             }
         "QuestionWasCompleted" ->
             %QuestionWasCompleted{

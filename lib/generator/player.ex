@@ -67,7 +67,7 @@ defmodule Quizzy.Generator.Player do
 
   defp generate_player(timestamp) do
     meta = Util.generate_meta(timestamp)
-    player_id = UUID.uuid4()
+    player_id = Util.generate_id
 
     [first_name, last_name] = Enum.at(@player_names, (:rand.uniform(50) - 1)) |> String.split
 

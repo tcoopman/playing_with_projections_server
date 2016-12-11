@@ -1,5 +1,6 @@
 defmodule Quizzy.Generator.Util do
   alias Quizzy.Events.Meta
+  alias Quizzy.Generator.IdGenerator
 
   def filter_from_distribution(distribution, {year, month}) do
     Enum.filter(distribution, fn
@@ -23,8 +24,12 @@ defmodule Quizzy.Generator.Util do
     end
   end
 
+  def generate_id do
+    IdGenerator.new_id
+  end
+
   def generate_meta(%DateTime{} = timestamp) do
-    id = UUID.uuid4()
+    id = generate_id
 
     %Meta{id: id, timestamp: timestamp}
   end

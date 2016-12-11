@@ -85,7 +85,7 @@ defmodule Quizzy.Generator.Quiz do
 
   defp generate_quiz(timestamp, event) do
     meta = Util.generate_meta(timestamp)
-    quiz_id = UUID.uuid4()
+    quiz_id = Util.generate_id
 
     owner_id = event.player_id
 
@@ -112,7 +112,7 @@ defmodule Quizzy.Generator.Quiz do
     for _ <- 0..number_of_questions do
       minutes_to_add = :rand.uniform(20)
       timestamp = Timex.add(quiz_meta.timestamp, Timex.Duration.from_minutes(minutes_to_add))
-      question_id = UUID.uuid4()
+      question_id = Util.generate_id
       question = Util.rand_from_list(@questions)
       answer = answer_for_question(question)
       meta = Util.generate_meta(timestamp)
@@ -133,8 +133,8 @@ defmodule Quizzy.Generator.Quiz do
     %QuizWasPublished{meta: meta, quiz_id: quiz_id, secret_questions: questions}
   end
 
-  defp answer_for_question(question) do
-    :crypto.hash(:sha, question) |> Base.encode16 |> String.downcase
+  def answer_for_question(question) do
+    :crypto.hash(:md5, question) |> Base.encode16 |> String.downcase |> String.slice(0..6)
   end
 
   defp pick_type_of_quiz do

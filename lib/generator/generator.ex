@@ -1,4 +1,5 @@
 defmodule Quizzy.Generator do
+  alias Quizzy.Generator.IdGenerator
   alias Quizzy.Generator.Player
   alias Quizzy.Generator.Player.TypeOfPlayer
   alias Quizzy.Generator.Quiz
@@ -6,11 +7,14 @@ defmodule Quizzy.Generator do
   alias Quizzy.Events.{QuizWasPublished}
 
   def generate({year, month}) do
+    IdGenerator.start_link
     players = generate_players({year, month})
 
     quizzes = generate_quizzes(players)
 
     games = generate_games(players, quizzes)
+
+    IdGenerator.stop
 
     players ++ quizzes ++ games
     |> Enum.flat_map(fn
@@ -18,6 +22,7 @@ defmodule Quizzy.Generator do
       %{events: events} -> events
       event -> [event]
     end)
+    |> Enum.sort(&(Timex.compare(&1.meta.timestamp, &2.meta.timestamp) < 1))
   end
 
   def generate_players({year, month}) do
@@ -47,10 +52,14 @@ defmodule Quizzy.Generator do
       quiz_playing_distribution_picker <= 1 -> TypeOfPlayer.try_out_player
     end
 
+    fast_player =
+
 
     %TypeOfPlayer{
       quiz_publish_distribution: quiz_publish_distribution,
-      quiz_playing_distribution: quiz_playing_distribution
+      quiz_playing_distribution: quiz_playing_distribution,
+      answer_speed: 20,
+      answer_correctness: 0.5
     }
   end
 end
