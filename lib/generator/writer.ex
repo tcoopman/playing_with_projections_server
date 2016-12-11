@@ -1,7 +1,7 @@
 defmodule Quizzy.Generator.Writer do
     alias Quizzy.Events
 
-    def write_json(file_name, events) do
+    def write_json(events, file_name) do
         path = "data"
         file = Path.join("data", "#{file_name}.json")
 

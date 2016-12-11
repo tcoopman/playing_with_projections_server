@@ -32,9 +32,11 @@ defmodule Quizzy.Generator.Game do
 
     opened_games_per_month = count_opened_games_per_month(opened_games_events)
 
+    sorted_all_registered_players = Enum.sort_by(all_registered_players, &(&1.event.meta.timestamp), &(Timex.compare(&1, &2) < 1))
+
     played_games = opened_games
     |> Enum.flat_map(fn {questions, opened_game} ->
-      possible_players = filter_players(opened_game, all_registered_players)
+      possible_players = filter_players(opened_game, sorted_all_registered_players)
 
       month_of_opened_game = Util.year_month(opened_game.meta.timestamp)
       number_opened_games_this_month = Map.get(opened_games_per_month, month_of_opened_game, 0)
@@ -51,7 +53,7 @@ defmodule Quizzy.Generator.Game do
         game_played_events = play_game(game_was_started_meta.timestamp, opened_game.game_id, joined_players, questions)
         joined_player_events = Enum.map(joined_players, fn {type, event} -> event end)
 
-        joined_player_events ++ [game_was_started] ++ game_played_events
+        [game_was_started] ++ joined_player_events ++ game_played_events
       end
 
     end)
@@ -81,9 +83,9 @@ defmodule Quizzy.Generator.Game do
   end
 
   defp filter_players(%GameWasOpened{meta: %{timestamp: game_opened_timestamp}}, registered_players) do
-    Enum.filter(registered_players,
+    Enum.drop_while(registered_players,
       fn %{event: %PlayerHasRegistered{meta: %{timestamp: player_registered_timestamp}}} ->
-        Timex.after?(game_opened_timestamp, player_registered_timestamp)
+        Timex.before?(game_opened_timestamp, player_registered_timestamp)
       end)
   end
 
@@ -99,7 +101,7 @@ defmodule Quizzy.Generator.Game do
         quiz_playing_distribution_dates = Util.numbers_to_date_map(quiz_playing_distribution, year_month_player_joined, {2017, 01})
 
         number_of_games_playing_this_month = Map.get(quiz_playing_distribution_dates, year_month_game_opened, 0)
-        chance_of_playing_in_this_month = number_of_games_playing_this_month / number_opened_games_this_month
+        chance_of_playing_in_this_month = if number_opened_games_this_month == 0, do: 0, else: number_of_games_playing_this_month / number_opened_games_this_month
         if :rand.uniform < chance_of_playing_in_this_month do
           timestamp = Util.random_timestamp_after_minutes(meta.timestamp, 5)
           joined_meta = Util.generate_meta(timestamp)
@@ -126,7 +128,7 @@ defmodule Quizzy.Generator.Game do
           question_completion_timestamp = Timex.add(question_asked_timestamp, Timex.Duration.from_seconds(30))
           question_completed = %QuestionWasCompleted{meta: Util.generate_meta(question_completion_timestamp), game_id: game_id, question_id: question_id}
 
-          [question_asked] ++ answers ++ [question_completed]
+          [question_asked] ++ [question_completed] ++ answers
     end)
 
 
@@ -134,7 +136,7 @@ defmodule Quizzy.Generator.Game do
     game_finished_timestamp = Timex.add(game_was_started_timestamp, end_of_game_offset)
     game_finished = %GameWasFinished{meta: Util.generate_meta(game_finished_timestamp), game_id: game_id}
 
-    played_game_events ++ [game_finished]
+    [game_finished] ++ played_game_events
   end
 
 

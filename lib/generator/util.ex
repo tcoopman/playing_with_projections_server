@@ -19,7 +19,7 @@ defmodule Quizzy.Generator.Util do
           hours = Kernel.trunc(:rand.uniform()*24)
           minutes = Kernel.trunc(:rand.uniform()*60)
           seconds = Kernel.trunc(:rand.uniform()*60)
-          Timex.to_datetime({{year, month, day}, {hours, minutes, seconds}}, "Europe/Brussels")
+          Timex.to_datetime({{year, month, day}, {hours, minutes, seconds}})
         end
     end
   end
@@ -43,12 +43,6 @@ defmodule Quizzy.Generator.Util do
     normalized_number = Kernel.trunc(nb + (:rand.normal * (nb/2)))
 
     if normalized_number < 0, do: 0, else: normalized_number
-  end
-
-  def rand_from_list(list) do
-    length = Enum.count list
-    index = :rand.uniform(length) -1
-    Enum.at(list, index)
   end
 
   def numbers_to_date_map(%{} = already_distribution, _, _) do
@@ -82,5 +76,7 @@ defmodule Quizzy.Generator.Util do
 
    {year, month}
   end
+
+  def hash_string(string), do: :crypto.hash(:md5, string) |> Base.encode16
 
 end

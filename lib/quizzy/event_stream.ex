@@ -21,8 +21,10 @@ defmodule Quizzy.EventStream do
     # Server
 
     def init(_) do
-        state = read_json_files
-       {:ok, state}
+      # reading all the files is way too slow for a start up
+      # state = read_json_files
+      # {:ok, state}
+       {:ok, %{}}
     end
 
     def handle_cast(:stop, _, state) do
