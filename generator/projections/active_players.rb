@@ -6,15 +6,21 @@ class ActivePlayers
   end
 
   def on(date)
-    players = @events.select{ |e| e.type == 'PlayerHasRegistered' }
-                     .map{|player| player.payload.dup}
+    join_events = @events.select { |e| in_range(date, e.timestamp) }
+                         .select { |e| e.type == 'PlayerJoinedGame' }
+                         .map(&:payload)
+    players = @events.select { |e| e.type == 'PlayerHasRegistered' }
+                     .map(&:payload)
 
-    selection = @events.select do |e|
-      e.type == 'PlayerJoinedGame'
+    players.map do |player|
+      games_played = join_events.select{|e| e.player_id == player.player_id}
+      OpenStruct.new(player: player, games_played: games_played.count)
     end
-    .select do |event|
-      event.timestamp.year == date.year && event.timestamp.month == date.month
-    end
-    selection
+           .select{|e| e.games_played > 10}
+
+  end
+
+  def in_range(reference_date, other_date)
+    reference_date.year == other_date.year && reference_date.month == other_date.month
   end
 end

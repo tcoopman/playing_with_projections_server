@@ -58,11 +58,12 @@ def run(stream_name)
   end
   puts
 
-  date = DateTime.parse('2014-11-17')
+  date = DateTime.parse('2014-06-14')
+
   puts "Active players on #{date}"
-  ActivePlayers.new(events).on(date).each do |player|
-    puts player.inspect
-    puts "#{player['first_name']} #{player['last_name']}: #{player[:games_played]} games played"
+  ActivePlayers.new(events).on(date).each do |activity|
+    # puts activity.inspect
+    puts "#{activity.player.first_name} #{activity.player.last_name}: #{activity.games_played} games played"
   end
 
 end
