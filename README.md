@@ -1,3 +1,8 @@
+# Deprecated
+
+Want to try the workshop, go to https://playingwithprojections.github.io/
+Everything underneed is not maintained, will probably not work anymore.
+
 # Playing with Projections
 
 [![Build Status](https://travis-ci.org/tcoopman/playing_with_projections_server.svg?branch=master)](https://travis-ci.org/tcoopman/playing_with_projections_server)
